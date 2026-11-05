@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   BookOpen,
   PlusCircle,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,10 @@ interface AdminDashboardClientProps {
     totalClasses: number;
     totalExams?: number;
     totalTimetables?: number;
+    totalAssignments?: number;
+    publishedAssignments?: number;
+    totalSubmissions?: number;
+    pendingSubmissions?: number;
     attendanceRate: string;
   };
 }
@@ -71,6 +76,14 @@ export function AdminDashboardClient({ realStats }: AdminDashboardClientProps) {
       isPositive: true,
       subtext: "Conflict Verified",
       icon: Clock,
+    },
+    {
+      title: "Assignments",
+      value: realStats?.totalAssignments !== undefined ? realStats.totalAssignments.toLocaleString() : "0",
+      change: `${realStats?.publishedAssignments || 0} Published`,
+      isPositive: true,
+      subtext: `${realStats?.pendingSubmissions || 0} Submissions Pending`,
+      icon: FileText,
     },
   ];
 

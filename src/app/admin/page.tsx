@@ -5,6 +5,8 @@ import { Class } from "@/models/Class";
 import { Attendance } from "@/models/Attendance";
 import { Exam } from "@/models/Exam";
 import { Timetable } from "@/models/Timetable";
+import { Assignment } from "@/models/Assignment";
+import { Submission } from "@/models/Submission";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { AdminDashboardClient } from "@/components/admin/AdminDashboardClient";
@@ -14,14 +16,28 @@ export default async function AdminPage() {
   await connectToDatabase();
 
   // Fetch real counts from MongoDB
-  const [totalStudents, totalTeachers, totalClasses, totalExams, totalTimetables, attendanceAgg] =
-    await Promise.all([
-      Student.countDocuments({ status: "active" }),
-      Teacher.countDocuments({ status: "active" }),
-      Class.countDocuments({}),
-      Exam.countDocuments({}),
-      Timetable.countDocuments({}),
-      Attendance.aggregate([
+  const [
+    totalStudents,
+    totalTeachers,
+    totalClasses,
+    totalExams,
+    totalTimetables,
+    totalAssignments,
+    publishedAssignments,
+    totalSubmissions,
+    pendingSubmissions,
+    attendanceAgg,
+  ] = await Promise.all([
+    Student.countDocuments({ status: "active" }),
+    Teacher.countDocuments({ status: "active" }),
+    Class.countDocuments({}),
+    Exam.countDocuments({}),
+    Timetable.countDocuments({}),
+    Assignment.countDocuments({}),
+    Assignment.countDocuments({ status: "published" }),
+    Submission.countDocuments({}),
+    Submission.countDocuments({ status: { $in: ["submitted", "late"] } }),
+    Attendance.aggregate([
         {
           $group: {
             _id: null,
@@ -60,6 +76,10 @@ export default async function AdminPage() {
           totalClasses,
           totalExams,
           totalTimetables,
+          totalAssignments,
+          publishedAssignments,
+          totalSubmissions,
+          pendingSubmissions,
           attendanceRate,
         }}
       />
