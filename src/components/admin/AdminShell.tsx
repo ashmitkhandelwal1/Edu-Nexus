@@ -12,6 +12,7 @@ import {
   FileSpreadsheet,
   Clock,
   FileText,
+  CreditCard,
   Settings,
   Bell,
   LogOut,
@@ -52,6 +53,7 @@ export function AdminShell({ adminEmail, children }: AdminShellProps) {
     { label: "Timetable", icon: Clock, href: "/admin/timetable", exact: false },
     { label: "Assignments", icon: FileText, href: "/admin/assignments", exact: false },
     { label: "Exams & Marks", icon: FileSpreadsheet, href: "/admin/exams", exact: false },
+    { label: "Fee Management", icon: CreditCard, href: "/admin/fees", exact: false },
     { label: "Platform Settings", icon: Settings, href: "#", exact: true },
   ];
 

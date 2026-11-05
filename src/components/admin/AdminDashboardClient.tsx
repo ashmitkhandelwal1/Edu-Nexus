@@ -14,6 +14,7 @@ import {
   BookOpen,
   PlusCircle,
   FileText,
+  CreditCard,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,10 @@ interface AdminDashboardClientProps {
     publishedAssignments?: number;
     totalSubmissions?: number;
     pendingSubmissions?: number;
+    totalFeesExpected?: number;
+    totalFeesCollected?: number;
+    totalFeesOutstanding?: number;
+    overdueFeeCount?: number;
     attendanceRate: string;
   };
 }
@@ -84,6 +89,14 @@ export function AdminDashboardClient({ realStats }: AdminDashboardClientProps) {
       isPositive: true,
       subtext: `${realStats?.pendingSubmissions || 0} Submissions Pending`,
       icon: FileText,
+    },
+    {
+      title: "Fee Collections",
+      value: `$${(realStats?.totalFeesCollected || 0).toLocaleString()}`,
+      change: `$${(realStats?.totalFeesOutstanding || 0).toLocaleString()} Pending`,
+      isPositive: true,
+      subtext: `${realStats?.overdueFeeCount || 0} Overdue Accounts`,
+      icon: CreditCard,
     },
   ];
 

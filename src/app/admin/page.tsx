@@ -7,6 +7,7 @@ import { Exam } from "@/models/Exam";
 import { Timetable } from "@/models/Timetable";
 import { Assignment } from "@/models/Assignment";
 import { Submission } from "@/models/Submission";
+import { FeeRecord } from "@/models/FeeRecord";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { AdminDashboardClient } from "@/components/admin/AdminDashboardClient";
@@ -26,6 +27,7 @@ export default async function AdminPage() {
     publishedAssignments,
     totalSubmissions,
     pendingSubmissions,
+    feeAgg,
     attendanceAgg,
   ] = await Promise.all([
     Student.countDocuments({ status: "active" }),
@@ -37,6 +39,17 @@ export default async function AdminPage() {
     Assignment.countDocuments({ status: "published" }),
     Submission.countDocuments({}),
     Submission.countDocuments({ status: { $in: ["submitted", "late"] } }),
+    FeeRecord.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalExpected: { $sum: "$totalAmount" },
+          totalCollected: { $sum: "$paidAmount" },
+          totalOutstanding: { $sum: "$pendingAmount" },
+          overdue: { $sum: { $cond: [{ $eq: ["$status", "overdue"] }, 1, 0] } },
+        },
+      },
+    ]),
     Attendance.aggregate([
         {
           $group: {
@@ -67,6 +80,13 @@ export default async function AdminPage() {
     attendanceRate = `${rate}%`;
   }
 
+  const feeStats = feeAgg[0] || {
+    totalExpected: 0,
+    totalCollected: 0,
+    totalOutstanding: 0,
+    overdue: 0,
+  };
+
   return (
     <AdminShell adminEmail={user?.email || "admin@edunexus.internal"}>
       <AdminDashboardClient
@@ -80,6 +100,10 @@ export default async function AdminPage() {
           publishedAssignments,
           totalSubmissions,
           pendingSubmissions,
+          totalFeesExpected: feeStats.totalExpected,
+          totalFeesCollected: feeStats.totalCollected,
+          totalFeesOutstanding: feeStats.totalOutstanding,
+          overdueFeeCount: feeStats.overdue,
           attendanceRate,
         }}
       />
