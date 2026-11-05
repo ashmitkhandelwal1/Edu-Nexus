@@ -12,7 +12,7 @@ import { bulkAttendanceSchema } from "@/lib/validations/attendance";
 export async function GET(req: NextRequest) {
   try {
     const authUser = await getAuthenticatedUser(req);
-    if (!authUser || authUser.role !== "admin") {
+    if (!authUser || (authUser.role !== "admin" && authUser.role !== "teacher")) {
       return NextResponse.json(
         { success: false, error: "Unauthorized access" },
         { status: 401 }
@@ -28,6 +28,24 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get("status")?.trim() || "";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.max(1, Math.min(100, parseInt(searchParams.get("limit") || "50", 10)));
+
+    // If caller is teacher, verify they are assigned to this class
+    if (authUser.role === "teacher") {
+      const teacherDoc = await mongoose.model("Teacher").findOne({ email: authUser.email.toLowerCase() });
+      if (!teacherDoc) {
+        return NextResponse.json({ success: false, error: "Teacher profile not found" }, { status: 403 });
+      }
+
+      if (classId) {
+        const isAssigned = await Class.findOne({
+          _id: classId,
+          $or: [{ classTeacher: teacherDoc._id }, { "subjects.teacher": teacherDoc._id }],
+        });
+        if (!isAssigned) {
+          return NextResponse.json({ success: false, error: "You are not authorized to view attendance for this class" }, { status: 403 });
+        }
+      }
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: Record<string, any> = {};
@@ -81,7 +99,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const authUser = await getAuthenticatedUser(req);
-    if (!authUser || authUser.role !== "admin") {
+    if (!authUser || (authUser.role !== "admin" && authUser.role !== "teacher")) {
       return NextResponse.json(
         { success: false, error: "Unauthorized access" },
         { status: 401 }
@@ -119,6 +137,27 @@ export async function POST(req: NextRequest) {
         { success: false, error: "Class not found" },
         { status: 404 }
       );
+    }
+
+    // Server-side check: If caller is a teacher, verify they are assigned to this class
+    if (authUser.role === "teacher") {
+      const teacherDoc = await mongoose.model("Teacher").findOne({ email: authUser.email.toLowerCase() });
+      if (!teacherDoc) {
+        return NextResponse.json({ success: false, error: "Teacher profile not found" }, { status: 403 });
+      }
+
+      const isAssigned =
+        (targetClass.classTeacher && targetClass.classTeacher.toString() === teacherDoc._id.toString()) ||
+        (targetClass.subjects || []).some(
+          (s: any) => s.teacher && s.teacher.toString() === teacherDoc._id.toString()
+        );
+
+      if (!isAssigned) {
+        return NextResponse.json(
+          { success: false, error: "Unauthorized: You are only allowed to mark attendance for your assigned classes." },
+          { status: 403 }
+        );
+      }
     }
 
     // Verify all student IDs exist and belong to this class cohort

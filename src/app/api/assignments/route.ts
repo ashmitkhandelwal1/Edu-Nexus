@@ -13,7 +13,7 @@ import { createAssignmentSchema } from "@/lib/validations/assignment";
 export async function GET(req: NextRequest) {
   try {
     const authUser = await getAuthenticatedUser(req);
-    if (!authUser || authUser.role !== "admin") {
+    if (!authUser || (authUser.role !== "admin" && authUser.role !== "teacher")) {
       return NextResponse.json(
         { success: false, error: "Unauthorized access" },
         { status: 401 }
@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const authUser = await getAuthenticatedUser(req);
-    if (!authUser || authUser.role !== "admin") {
+    if (!authUser || (authUser.role !== "admin" && authUser.role !== "teacher")) {
       return NextResponse.json(
         { success: false, error: "Unauthorized access" },
         { status: 401 }

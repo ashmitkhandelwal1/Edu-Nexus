@@ -16,7 +16,7 @@ interface Params {
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
     const authUser = await getAuthenticatedUser(req);
-    if (!authUser || authUser.role !== "admin") {
+    if (!authUser || (authUser.role !== "admin" && authUser.role !== "teacher")) {
       return NextResponse.json(
         { success: false, error: "Unauthorized access" },
         { status: 401 }
