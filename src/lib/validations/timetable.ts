@@ -49,3 +49,4 @@ export const updateTimetableSchema = z.object({
 export type PeriodInput = z.infer<typeof periodSchema>;
 export type CreateTimetableInput = z.infer<typeof createTimetableSchema>;
 export type UpdateTimetableInput = z.infer<typeof updateTimetableSchema>;
+

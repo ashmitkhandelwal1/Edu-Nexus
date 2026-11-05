@@ -240,3 +240,4 @@ export async function checkTimetableConflicts({
 
   return { hasConflict: false };
 }
+

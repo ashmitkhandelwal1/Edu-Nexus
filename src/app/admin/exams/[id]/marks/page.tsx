@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import mongoose from "mongoose";
 import connectToDatabase from "@/lib/mongodb";
 import { Exam } from "@/models/Exam";
+import "@/models/Class";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { MarksEntryClient } from "@/components/admin/MarksEntryClient";

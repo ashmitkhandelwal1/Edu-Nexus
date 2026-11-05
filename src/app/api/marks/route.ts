@@ -4,6 +4,7 @@ import connectToDatabase from "@/lib/mongodb";
 import { Marks } from "@/models/Marks";
 import { Exam } from "@/models/Exam";
 import { Student } from "@/models/Student";
+import "@/models/User";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { bulkMarksSchema } from "@/lib/validations/exam";
 

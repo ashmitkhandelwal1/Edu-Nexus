@@ -4,6 +4,7 @@ import connectToDatabase from "@/lib/mongodb";
 import { Exam } from "@/models/Exam";
 import { Student } from "@/models/Student";
 import { Marks } from "@/models/Marks";
+import "@/models/Class";
 import { getAuthenticatedUser } from "@/lib/auth";
 
 interface Params {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import { Timetable, DayOfWeek } from "@/models/Timetable";
+import "@/models/Class";
+import "@/models/Teacher";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { updateTimetableSchema } from "@/lib/validations/timetable";
 import { checkTimetableConflicts } from "@/lib/timetable-conflict";
@@ -186,3 +188,4 @@ export async function DELETE(
     );
   }
 }
+

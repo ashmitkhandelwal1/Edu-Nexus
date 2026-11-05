@@ -245,3 +245,4 @@ export function TeacherTimetableViewClient({ teachers }: TeacherViewProps) {
     </div>
   );
 }
+

@@ -238,3 +238,4 @@ export function ClassTimetableViewClient({ classes }: ClassViewProps) {
     </div>
   );
 }
+

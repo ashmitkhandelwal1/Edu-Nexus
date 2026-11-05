@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectToDatabase from "@/lib/mongodb";
 import { Attendance } from "@/models/Attendance";
+import "@/models/Student";
+import "@/models/Class";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { updateAttendanceRecordSchema } from "@/lib/validations/attendance";
 

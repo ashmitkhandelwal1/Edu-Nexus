@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
         classId: new mongoose.Types.ObjectId(classId),
         academicYear,
         dayOfWeek,
-        periods,
+        periods: periods as any,
       });
     }
 
@@ -159,3 +159,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

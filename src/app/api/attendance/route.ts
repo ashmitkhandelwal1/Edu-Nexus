@@ -4,6 +4,7 @@ import connectToDatabase from "@/lib/mongodb";
 import { Attendance } from "@/models/Attendance";
 import { Class } from "@/models/Class";
 import { Student } from "@/models/Student";
+import "@/models/User";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { bulkAttendanceSchema } from "@/lib/validations/attendance";
 

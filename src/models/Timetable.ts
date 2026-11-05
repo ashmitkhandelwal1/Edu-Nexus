@@ -58,15 +58,6 @@ const PeriodSchema = new Schema<IPeriod>(
     subjectName: {
       type: String,
       trim: true,
-      validate: {
-        validator: function (this: IPeriod, val: string | undefined) {
-          if (this.type === "class") {
-            return typeof val === "string" && val.trim().length > 0;
-          }
-          return true;
-        },
-        message: "Subject name is required for class periods",
-      },
     },
     teacherId: {
       type: Schema.Types.ObjectId,
@@ -117,3 +108,4 @@ export const Timetable: Model<ITimetable> =
   mongoose.models.Timetable || mongoose.model<ITimetable>("Timetable", TimetableSchema);
 
 export default Timetable;
+

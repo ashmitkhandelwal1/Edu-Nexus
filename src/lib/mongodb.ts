@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
 import dns from "node:dns";
+import mongoose from "mongoose";
 
-// Configure DNS resolution specifically for environments where local/ISP DNS fails Node's SRV resolution
+// Configure Node.js DNS servers (Google & Cloudflare fallback)
 function configureDns() {
-  const isDev = process.env.NODE_ENV !== "production";
   const customServers = process.env.MONGODB_DNS_SERVERS;
 
   if (customServers) {
@@ -22,20 +21,69 @@ function configureDns() {
     }
   }
 
-  // In development environments (particularly on Windows where Node.js c-ares DNS resolver
-  // fails SRV queries on local routers/ISPs), configure Google DNS fallback (8.8.8.8, 8.8.4.4).
-  if (isDev) {
-    try {
-      dns.setDefaultResultOrder?.("ipv4first");
-      dns.setServers(["8.8.8.8", "8.8.4.4"]);
-    } catch {
-      // In restricted or browser runtimes, skip gracefully
-    }
+  try {
+    dns.setDefaultResultOrder?.("ipv4first");
+    dns.setServers(["8.8.8.8", "1.1.1.1"]);
+  } catch {
+    // In restricted runtimes, skip gracefully
   }
 }
 
-// Run DNS configuration before connection setup
+// Run DNS configuration immediately upon module evaluation
 configureDns();
+
+/**
+ * Dedicated DNS Resolver strategy:
+ * If the connection string is a `mongodb+srv://` URI, Windows' default DNS resolver can
+ * cause ECONNREFUSED when querying SRV/TXT records.
+ * We resolve the SRV hosts and TXT options using a dedicated dns.promises.Resolver with
+ * fallback DNS servers ('8.8.8.8', '1.1.1.1') before passing to Mongoose.
+ */
+async function resolveMongoConnectionUri(rawUri: string): Promise<string> {
+  if (!rawUri.startsWith("mongodb+srv://")) {
+    return rawUri;
+  }
+
+  const srvRegex = /^mongodb\+srv:\/\/([^:]+):([^@]+)@([^/?]+)(\/[^?]*)?(\?.*)?$/;
+  const match = rawUri.match(srvRegex);
+  if (!match) {
+    return rawUri;
+  }
+
+  const [, username, password, host, pathPart, queryPart] = match;
+
+  try {
+    const resolver = new dns.promises.Resolver();
+    const customServers = process.env.MONGODB_DNS_SERVERS;
+    const servers = customServers
+      ? customServers.split(",").map((s) => s.trim()).filter(Boolean)
+      : ["8.8.8.8", "1.1.1.1"];
+    resolver.setServers(servers);
+
+    // Resolve SRV records for the cluster
+    const srvRecords = await resolver.resolveSrv(`_mongodb._tcp.${host}`);
+    if (!srvRecords || srvRecords.length === 0) {
+      return rawUri;
+    }
+
+    // Resolve optional TXT records for replicaSet and authSource
+    const txtRecords = await resolver.resolveTxt(host).catch(() => []);
+    const txtString = txtRecords.flat().join("&");
+
+    const hostList = srvRecords.map((r) => `${r.name}:${r.port}`).join(",");
+    const existingParams = queryPart ? queryPart.slice(1) : "";
+
+    const combinedParams = [txtString, existingParams, "ssl=true"]
+      .filter(Boolean)
+      .join("&");
+
+    const pathString = pathPart || "/";
+    return `mongodb://${username}:${password}@${hostList}${pathString}?${combinedParams}`;
+  } catch (error) {
+    console.warn("Dedicated DNS SRV resolution warning, falling back to raw URI:", error);
+    return rawUri;
+  }
+}
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -75,9 +123,10 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(uri, opts).then((mongooseInstance) => {
-      return mongooseInstance;
-    });
+    cached.promise = (async () => {
+      const resolvedUri = await resolveMongoConnectionUri(uri);
+      return mongoose.connect(resolvedUri, opts);
+    })();
   }
 
   try {

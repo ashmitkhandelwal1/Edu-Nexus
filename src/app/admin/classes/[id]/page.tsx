@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import connectToDatabase from "@/lib/mongodb";
 import { Class } from "@/models/Class";
 import { Student } from "@/models/Student";
+import "@/models/Teacher";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { ClassDetailClient } from "@/components/admin/ClassDetailClient";
