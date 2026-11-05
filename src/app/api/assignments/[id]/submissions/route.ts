@@ -80,7 +80,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 export async function POST(req: NextRequest, { params }: Params) {
   try {
     const authUser = await getAuthenticatedUser(req);
-    if (!authUser || authUser.role !== "admin") {
+    if (!authUser || (authUser.role !== "admin" && authUser.role !== "student")) {
       return NextResponse.json(
         { success: false, error: "Unauthorized access" },
         { status: 401 }
@@ -127,6 +127,20 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     const { studentId, textAnswer, attachments } = validation.data;
+
+    // Security check: if the user is a student, ensure studentId matches their own profile
+    if (authUser.role === "student") {
+      const authenticatedStudent = await Student.findOne({
+        email: authUser.email.toLowerCase(),
+        status: "active",
+      });
+      if (!authenticatedStudent || authenticatedStudent._id.toString() !== studentId) {
+        return NextResponse.json(
+          { success: false, error: "Access denied: You can only submit assignments for your own student record" },
+          { status: 403 }
+        );
+      }
+    }
 
     // Verify student exists and belongs to the assignment's class
     const student = await Student.findById(studentId);

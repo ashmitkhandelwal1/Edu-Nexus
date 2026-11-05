@@ -52,7 +52,7 @@ export function AnnouncementFeedClient({ userRole, userEmail }: AnnouncementFeed
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Link
-                href={userRole === "admin" ? "/admin" : "/login"}
+                href={userRole === "admin" ? "/admin" : userRole === "teacher" ? "/teacher" : userRole === "student" ? "/student" : "/login"}
                 className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
