@@ -162,7 +162,7 @@ export function FeeManagementClient({ initialClasses }: FeeManagementClientProps
               <DollarSign className="w-4 h-4 text-indigo-400" />
             </div>
             <span className="text-xl font-black text-white">
-              ${report.totalExpected.toLocaleString()}
+              ₹{report.totalExpected.toLocaleString()}
             </span>
             <span className="text-[10px] text-slate-500 block mt-0.5">
               Across {report.totalRecords} student accounts
@@ -175,7 +175,7 @@ export function FeeManagementClient({ initialClasses }: FeeManagementClientProps
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             </div>
             <span className="text-xl font-black text-emerald-400">
-              ${report.totalCollected.toLocaleString()}
+              ₹{report.totalCollected.toLocaleString()}
             </span>
             <span className="text-[10px] text-emerald-500/80 block mt-0.5">
               {report.collectionRate} collection efficiency
@@ -188,7 +188,7 @@ export function FeeManagementClient({ initialClasses }: FeeManagementClientProps
               <Clock className="w-4 h-4 text-amber-400" />
             </div>
             <span className="text-xl font-black text-amber-400">
-              ${report.totalOutstanding.toLocaleString()}
+              ₹{report.totalOutstanding.toLocaleString()}
             </span>
             <span className="text-[10px] text-slate-500 block mt-0.5">
               Pending student receivables
@@ -354,15 +354,15 @@ export function FeeManagementClient({ initialClasses }: FeeManagementClientProps
                           </td>
 
                           <td className="py-3 px-4 font-bold text-white">
-                            ${rec.totalAmount.toLocaleString()}
+                            ₹{rec.totalAmount.toLocaleString()}
                           </td>
 
                           <td className="py-3 px-4 font-bold text-emerald-400">
-                            ${rec.paidAmount.toLocaleString()}
+                            ₹{rec.paidAmount.toLocaleString()}
                           </td>
 
                           <td className="py-3 px-4 font-bold text-rose-400">
-                            ${rec.pendingAmount.toLocaleString()}
+                            ₹{rec.pendingAmount.toLocaleString()}
                           </td>
 
                           <td className="py-3 px-4">
@@ -435,7 +435,7 @@ export function FeeManagementClient({ initialClasses }: FeeManagementClientProps
                 <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
                   <div>
                     <span className="text-[10px] text-slate-500 block">Fee Amount</span>
-                    <span className="text-base font-black text-white">${s.amount.toLocaleString()}</span>
+                    <span className="text-base font-black text-white">₹{s.amount.toLocaleString()}</span>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] text-slate-500 block">Due Date</span>
@@ -512,18 +512,18 @@ export function FeeManagementClient({ initialClasses }: FeeManagementClientProps
               </div>
               <div className="flex items-center justify-between border-t border-slate-800 pt-2">
                 <span className="text-slate-400">Total Billed:</span>
-                <span className="font-bold text-white">${receiptRecord.totalAmount.toLocaleString()}</span>
+                <span className="font-bold text-white">₹{receiptRecord.totalAmount.toLocaleString()}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Total Paid:</span>
                 <span className="font-bold text-emerald-400">
-                  ${receiptRecord.paidAmount.toLocaleString()}
+                  ₹{receiptRecord.paidAmount.toLocaleString()}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Outstanding Balance:</span>
                 <span className="font-bold text-rose-400">
-                  ${receiptRecord.pendingAmount.toLocaleString()}
+                  ₹{receiptRecord.pendingAmount.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -545,7 +545,7 @@ export function FeeManagementClient({ initialClasses }: FeeManagementClientProps
                       className="flex items-center justify-between bg-slate-950 border border-slate-800 px-3 py-2 rounded-lg text-xs"
                     >
                       <div>
-                        <span className="font-bold text-emerald-400 block">+${p.amount.toLocaleString()}</span>
+                        <span className="font-bold text-emerald-400 block">+₹{p.amount.toLocaleString()}</span>
                         <span className="text-[10px] text-slate-500">
                           {new Date(p.paymentDate).toLocaleDateString()} • {p.paymentMethod.toUpperCase()}
                         </span>
