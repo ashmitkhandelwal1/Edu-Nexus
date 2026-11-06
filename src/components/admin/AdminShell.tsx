@@ -22,6 +22,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationBellDropdown } from "@/components/admin/NotificationBellDropdown";
 
 interface AdminShellProps {
   adminEmail: string;
@@ -56,7 +57,7 @@ export function AdminShell({ adminEmail, children }: AdminShellProps) {
     { label: "Exams & Marks", icon: FileSpreadsheet, href: "/admin/exams", exact: false },
     { label: "Fee Management", icon: CreditCard, href: "/admin/fees", exact: false },
     { label: "Announcements", icon: Megaphone, href: "/admin/announcements", exact: false },
-    { label: "Platform Settings", icon: Settings, href: "#", exact: true },
+    { label: "Platform Settings", icon: Settings, href: "/admin/settings", exact: true },
   ];
 
   const isNavActive = (href: string, exact: boolean) => {
@@ -162,13 +163,7 @@ export function AdminShell({ adminEmail, children }: AdminShellProps) {
 
           {/* Right Header items */}
           <div className="flex items-center gap-4">
-            <button
-              className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 relative"
-              aria-label="Notifications"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-blue-600" />
-            </button>
+            <NotificationBellDropdown />
 
             {/* Admin Profile & Logout */}
             <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
